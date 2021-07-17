@@ -8,15 +8,29 @@ import banco
 
 app = Tk()
 app.title("Projeto Agenda")
-app.geometry("500x330")
+app.geometry("500x420")
+
+def popular():
+    tv.delete(*tv.get_children())
+    vquery = "SELECT * FROM tb_contatos order by ID"
+    linhas = banco.dql(vquery)
+    for i in linhas:
+        tv.insert("", "end", values=i)
 
 def inserir():
-    if vid.get() == "" or vnome.get() == "" or vfone.get() == "":
+    if vnome.get() == "" or vfone.get() == "":
         messagebox.showinfo(title="Error", message="Digite todos os dados")
-    tv.insert("", "end", values=(vid.get(), vnome.get(), vfone.get()))
-    vid.delete(0, END)
+        return
+    try:
+        vquery="INSERT INTO tb_contatos (NOME, TELEFONE) VALUES ('"+vnome.get()+"', '"+vfone.get()+"')"
+        banco.dml(vquery)
+    except Error as ex:
+        messagebox.showinfo(title="Erro", message="Erro ao inserir")
+    popular()
     vnome.delete(0, END)
     vfone.delete(0, END)
+    vnome.focus()
+
 def deletar():
     try:
         itemSelecionado = tv.selection()[0]
@@ -24,58 +38,52 @@ def deletar():
     except Error as ex:
         messagebox.showinfo(title="Erro", message="Selecione uma ou mais opções")
 
-def obter():
-    try:
-        itemSelecionado = tv.selection()[0]
-        valores = tv.item(itemSelecionado, "values")
-        print("ID       : " + valores[0])
-        print("Nome     : " + valores[1])
-        print("Telefone : " + valores[2])
-    except Error as ex:
-        messagebox.showinfo(title="Erro", message="Selecione uma ou mais opções")
+def pesquisar():
+    tv.delete(*tv.get_children())
+    vquery = "SELECT * FROM tb_contatos WHERE nome LIKE '%"+vnomepesquisar.get()+"%' order by ID"
+    linhas = banco.dql(vquery)
+    for i in linhas:
+        tv.insert("", "end", values=i)
 
 
-frame1 = Frame(app, pady=10)
-frame1.pack()
+quadroGrid=LabelFrame(app, text="Contatos")
+quadroGrid.pack(fill="both", expand="yes", padx=10, pady=10)
 
-lbid=Label(frame1, text="ID")
-vid = Entry(frame1)
-
-lbnome=Label(frame1, text="NOME")
-vnome = Entry(frame1)
-
-lfone=Label(frame1, text="FONE")
-vfone = Entry(frame1)
-
-#listaNomes = [['0', 'Brertilda', 9878], ['1', 'Crisloide', 5554], ['2', 'Julsevan', 5841]]
-
-tv = ttk.Treeview(frame1, columns = ('id', 'nome', 'fone'), show= 'headings')
+tv = ttk.Treeview(quadroGrid, columns = ('id', 'nome', 'fone'), show= 'headings')
 tv.column('id', minwidth=0, width=80)
 tv.column('nome', minwidth=0, width=250)
 tv.column('fone', minwidth=0, width=120)
 tv.heading('id', text='ID')
 tv.heading('nome', text='NOME')
 tv.heading('fone', text='TELEFONE')
+tv.pack()
+popular()
 
-btn_inserir = Button(frame1, text="Inserir", command=inserir)
-btn_deletar = Button(frame1, text="Deletar", command=deletar)
-btn_obter = Button(frame1, text="Obter", command=obter)
+quadroInserir=LabelFrame(app, text="Inserir novos contatos")
+quadroInserir.pack(fill="both", expand="yes", padx=10, pady=10)
 
-lbid.grid(column=0, row=0)
-vid.grid(column=0, row=1)
+lbnome=Label(quadroInserir, text="Nome")
+lbnome.pack(side="left")
+vnome = Entry(quadroInserir)
+vnome.pack(side="left", padx=10)
+lbfone=Label(quadroInserir, text="Fone")
+lbfone.pack(side="left")
+vfone = Entry(quadroInserir)
+vfone.pack(side="left", padx=10)
+btn_inserir=Button(quadroInserir, text="Inserir", command=inserir)
+btn_inserir.pack(side="left", padx=10)
 
-lbnome.grid(column=1, row=0)
-vnome.grid(column=1, row=1)
+quadroPesquisar=LabelFrame(app, text="Pesquisar Contatos")
+quadroPesquisar.pack(fill="both", expand="yes", padx=10, pady=10)
 
-lfone.grid(column=2, row=0)
-vfone.grid(column=2, row=1)
+lbid=Label(quadroPesquisar, text="Nome")
+lbid.pack(side="left")
+vnomepesquisar = Entry(quadroPesquisar)
+vnomepesquisar.pack(side="left", padx=10)
+btn_pesquisar = Button(quadroPesquisar, text="Pesquisar", command=pesquisar)
+btn_pesquisar.pack(side="left", padx=10)
+btn_todos = Button(quadroPesquisar, text="Mostrar Todos", command=popular)
+btn_todos.pack(side="left", padx=10)
 
-tv.grid(column=0, row=3, columnspan=3, pady=5)
-
-btn_inserir.grid(column=0, row=4)
-btn_deletar.grid(column=1, row=4)
-btn_obter.grid(column=2, row=4)
-
-#tv.insert("", "end", values=(i, n, f))
 
 app.mainloop()
