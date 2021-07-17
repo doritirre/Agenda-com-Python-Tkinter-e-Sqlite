@@ -1,5 +1,8 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
+from sqlite3 import Error
+
 import os
 import banco
 
@@ -8,13 +11,29 @@ app.title("Projeto Agenda")
 app.geometry("500x330")
 
 def inserir():
-    pass
-
+    if vid.get() == "" or vnome.get() == "" or vfone.get() == "":
+        messagebox.showinfo(title="Error", message="Digite todos os dados")
+    tv.insert("", "end", values=(vid.get(), vnome.get(), vfone.get()))
+    vid.delete(0, END)
+    vnome.delete(0, END)
+    vfone.delete(0, END)
 def deletar():
-    pass
+    try:
+        itemSelecionado = tv.selection()[0]
+        tv.delete(itemSelecionado)
+    except Error as ex:
+        messagebox.showinfo(title="Erro", message="Selecione uma ou mais opções")
 
 def obter():
-    pass
+    try:
+        itemSelecionado = tv.selection()[0]
+        valores = tv.item(itemSelecionado, "values")
+        print("ID       : " + valores[0])
+        print("Nome     : " + valores[1])
+        print("Telefone : " + valores[2])
+    except Error as ex:
+        messagebox.showinfo(title="Erro", message="Selecione uma ou mais opções")
+
 
 frame1 = Frame(app, pady=10)
 frame1.pack()
