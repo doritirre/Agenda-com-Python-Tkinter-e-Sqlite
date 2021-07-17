@@ -14,12 +14,10 @@ vcon = ConexaoBanco()
 
 """ CRIAR TABELA """
 vsql = """
-        CREATE TABLE tb_contatos(
+        CREATE TABLE usuario_senha(        
         ID INTEGER PRIMARY KEY AUTOINCREMENT,
-        NOME VARCHAR(30),
-        TELEFONE VARCHAR(14),
-        EMAIL VARCHAR(30),
-        OBS VARCHAR(512)
+        USER VARCHAR(12),
+        SENHA VARCHAR(8)        
         );
         """
 def criarTabela(conexao, sql):
